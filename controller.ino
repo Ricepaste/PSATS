@@ -3,22 +3,33 @@ void setup()
     // int
     // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(12, OUTPUT);
+    digitalWrite(12, HIGH);
+
     Serial.begin(115200);
 }
 
 // the loop function runs over and over again forever
+String incomingByte = "";
 void loop()
 {
     if (Serial.available() > 0)
     {
         // read the incoming byte:
-        String incomingByte = Serial.readString();
+        incomingByte = Serial.readString();
         // say what you got:
         Serial.print("I received: ");
         Serial.println(incomingByte);
-        digitalWrite(LED_BUILTIN, HIGH); // turn the LED on (HIGH is the voltage level)
-        delay(1000);                     // wait for a second
-        digitalWrite(LED_BUILTIN, LOW);  // turn the LED off by making the voltage LOW
-        delay(1000);                     // wait for a second
+
+        if (incomingByte == "solar\n")
+        {
+            digitalWrite(LED_BUILTIN, HIGH);
+            Serial.println("solar_mode is ON");
+        }
+        else if (incomingByte == "normal\n")
+        {
+            Serial.println("normal electricity mode is ON");
+            digitalWrite(LED_BUILTIN, LOW);
+        }
     }
 }
