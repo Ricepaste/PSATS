@@ -4,7 +4,7 @@ void setup()
     // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(12, OUTPUT);
-    digitalWrite(12, HIGH);
+    // digitalWrite(12, HIGH);
 
     Serial.begin(115200);
 }
@@ -24,12 +24,14 @@ void loop()
         if (incomingByte == "solar\n")
         {
             digitalWrite(LED_BUILTIN, HIGH);
+            digitalWrite(12, HIGH);
             Serial.println("solar_mode is ON");
         }
         else if (incomingByte == "normal\n")
         {
-            Serial.println("normal electricity mode is ON");
             digitalWrite(LED_BUILTIN, LOW);
+            digitalWrite(12, LOW);
+            Serial.println("normal electricity mode is ON");
         }
     }
 }
