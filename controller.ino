@@ -13,7 +13,7 @@ void setup()
 String incomingByte = "";
 double ap;
 double voltage;
-bool Solar_Mode = false;
+bool Automatic_mode = false;
 void loop()
 {
 
@@ -27,20 +27,14 @@ void loop()
 
         if (incomingByte == "solar\n")
         {
-            digitalWrite(LED_BUILTIN, HIGH);
-            digitalWrite(12, HIGH);
-            Serial.println("solar_mode is ON");
-            Solar_Mode = true;
+            solar_mode();
         }
         else if (incomingByte == "normal\n")
         {
-            digitalWrite(LED_BUILTIN, LOW);
-            digitalWrite(12, LOW);
-            Serial.println("normal electricity mode is ON");
-            Solar_Mode = false;
+            normal_mode();
         }
     }
-    Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    // Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n");
     ap = analogRead(A0);
     ap = (ap - 505.) * 0.02;
     Serial.println("LED current consumption: " + String(ap) + "A");
@@ -50,5 +44,31 @@ void loop()
     voltage = analogRead(A2) / 68 * 1.67;
     Serial.println("solar panel voltage : " + String(voltage) + "V");
 
-    delay(1000);
+    if (Automatic_mode && voltage < 9.0)
+    {
+        normal_mode();
+        Automatic_mode = true;
+    }
+    else if (Automatic_mode && voltage >= 9.0)
+    {
+        solar_mode();
+    }
+
+    delay(2000);
+}
+
+void normal_mode()
+{
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(12, LOW);
+    Serial.println("normal electricity mode is ON");
+    Automatic_mode = false;
+}
+
+void solar_mode()
+{
+    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(12, HIGH);
+    Serial.println("solar_mode is ON");
+    Automatic_mode = true;
 }
