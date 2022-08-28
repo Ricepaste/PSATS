@@ -32,6 +32,10 @@ void loop()
             normal_mode();
         }
     }
+    // voltage = analogRead(A2) / 68 * 1.67;
+    // voltage = analogRead(A0) * 0.00489;
+    voltage = analogRead(A0);
+    Serial.println("solar panel voltage : " + String(voltage) + "V");
     delay(2000);
 }
 
