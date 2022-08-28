@@ -9,12 +9,11 @@ void setup()
 
 // the loop function runs over and over again forever
 String incomingByte = "";
-double ap;
-double voltage, voltage_sum;
-int counter = 0;
-long long last, now;
 void loop()
 {
+    int counter = 0;
+    long long last, now;
+    double voltage, voltage_sum;
     last = millis();
     counter = 0;
     voltage_sum = 0.0;
@@ -41,7 +40,7 @@ void loop()
         voltage = analogRead(A2) * analogRead(A2) * (-0.000000585) + analogRead(A2) * 0.020823;
         voltage_sum += voltage;
         counter++;
-    } while (now - last < 1000);
+    } while (now - last < 800);
     power_check(voltage_sum, counter);
     voltage = voltage_sum / counter;
     Serial.println("solar panel voltage : " + String(voltage) + "V");
@@ -51,15 +50,15 @@ void loop()
 void normal_mode(int B_voltage, int counter)
 {
     // Serial.println("normal electricity mode is ON");
-    if (B_voltage / counter >= 9.0)
+    if (B_voltage / counter >= 11.5)
     {
         Battery_100_Percent();
     }
-    else if (B_voltage / counter >= 7.0)
+    else if (B_voltage / counter >= 9.0)
     {
         Battery_75_Percent();
     }
-    else if (B_voltage / counter >= 5.0)
+    else if (B_voltage / counter >= 6.0)
     {
         Battery_50_Percent();
     }
@@ -77,15 +76,15 @@ void normal_mode(int B_voltage, int counter)
 
 void emergency_mode(double B_voltage, int counter)
 {
-    if (B_voltage / counter >= 9.0)
+    if (B_voltage / counter >= 11.5)
     {
         Battery_100_Percent();
     }
-    else if (B_voltage / counter >= 7.0)
+    else if (B_voltage / counter >= 9.0)
     {
         Battery_75_Percent();
     }
-    else if (B_voltage / counter >= 5.0)
+    else if (B_voltage / counter >= 6.0)
     {
         Battery_50_Percent();
     }
