@@ -2,8 +2,10 @@ void setup()
 {
     // int
     // initialize digital pin LED_BUILTIN as an output.
-    pinMode(LED_BUILTIN, OUTPUT);
-    pinMode(12, OUTPUT);
+    for (int i = 2; i < 13; i++)
+    {
+        pinMode(i, OUTPUT);
+    }
     // digitalWrite(12, HIGH);
 
     Serial.begin(115200);
@@ -16,59 +18,48 @@ double voltage;
 bool Automatic_mode = false;
 void loop()
 {
-
     if (Serial.available() > 0)
     {
-        // read the incoming byte:
         incomingByte = Serial.readString();
-        // say what you got:
         Serial.print("I received: ");
         Serial.println(incomingByte);
-
-        if (incomingByte == "solar\n")
+        if (incomingByte == "s\n")
         {
             solar_mode();
         }
-        else if (incomingByte == "normal\n")
+        else if (incomingByte == "n\n")
         {
             normal_mode();
         }
     }
-    // Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    ap = analogRead(A0);
-    ap = (ap - 505.) * 0.02;
-    Serial.println("LED current consumption: " + String(ap) + "A");
-    ap = analogRead(A1);
-    ap = (ap - 505.) * 0.02;
-    Serial.println("USB hub current consumption: " + String(ap) + "A");
-    voltage = analogRead(A2) / 68 * 1.67;
-    Serial.println("solar panel voltage : " + String(voltage) + "V");
-
-    if (Automatic_mode && voltage < 9.0)
-    {
-        normal_mode();
-        Automatic_mode = true;
-    }
-    else if (Automatic_mode && voltage >= 9.0)
-    {
-        solar_mode();
-    }
-
     delay(2000);
 }
 
 void normal_mode()
 {
-    digitalWrite(LED_BUILTIN, LOW);
-    digitalWrite(12, LOW);
+    digitalWrite(2, HIGH);
+    digitalWrite(3, HIGH);
+    digitalWrite(6, HIGH);
+    digitalWrite(7, HIGH);
+    digitalWrite(8, HIGH);
+    digitalWrite(9, HIGH);
+    digitalWrite(11, HIGH);
+    digitalWrite(12, HIGH);
+
     Serial.println("normal electricity mode is ON");
     Automatic_mode = false;
 }
 
 void solar_mode()
 {
-    digitalWrite(LED_BUILTIN, HIGH);
-    digitalWrite(12, HIGH);
+    digitalWrite(2, LOW);
+    digitalWrite(3, LOW);
+    digitalWrite(6, LOW);
+    digitalWrite(7, LOW);
+    digitalWrite(8, LOW);
+    digitalWrite(9, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(12, LOW);
     Serial.println("solar_mode is ON");
     Automatic_mode = true;
 }
