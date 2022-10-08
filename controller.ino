@@ -9,7 +9,7 @@ void setup()
     }
     Serial.begin(115200);
 }
-
+boolean lastmode_is_normal = false;
 // Arduino的迴圈，以下的程式會不停重複執行直到關機
 void loop()
 {
@@ -34,7 +34,7 @@ void loop()
         voltage = analogRead(A2) * analogRead(A2) * (-0.000000585) + analogRead(A2) * 0.020823;
         voltage_sum += voltage;
         counter++;
-    } while (now - last < 800);
+    } while (now - last < 1000);
 
     // 檢查目前的公共電力供電情形，並調整供電方針
     power_check(voltage_sum, counter);
@@ -44,51 +44,67 @@ void loop()
 void normal_mode(int B_voltage, int counter)
 {
     // 根據不同的電池電量，使用不同供電方案
-    if (B_voltage / counter >= 11.5)
+    if (B_voltage / counter >= 11.0)
     {
         Battery_100_Percent();
     }
-    else if (B_voltage / counter >= 9.0)
+    else if (B_voltage / counter >= 9. && B_voltage / counter <= 10.)
     {
         Battery_75_Percent();
     }
-    else if (B_voltage / counter >= 6.0)
+    else if (B_voltage / counter >= 7. && B_voltage / counter <= 8.)
     {
         Battery_50_Percent();
     }
     // 若電量不足25%，全部切換回到公共電力供電模式
-    else if (B_voltage / counter >= 3.0)
+    else if (B_voltage / counter >= 0.0 && B_voltage / counter <= 5.)
     {
         public_elec_mode();
-        Serial.println("Battery power < 25%");
-        Serial.println("Preserving power for emergency");
+        // Serial.println("Battery power < 25%");
+        // Serial.println("Preserving power for emergency");
         digitalWrite(4, HIGH);
         digitalWrite(5, LOW);
         digitalWrite(10, LOW);
         digitalWrite(13, LOW);
     }
+    else if (lastmode_is_normal == false)
+    {
+        public_elec_mode();
+        // Serial.println("Battery power < 25%");
+        // Serial.println("Preserving power for emergency");
+        digitalWrite(4, HIGH);
+        digitalWrite(5, LOW);
+        digitalWrite(10, LOW);
+        digitalWrite(13, LOW);
+    }
+    lastmode_is_normal = true;
 }
 
 // 緊急供電模式
 void emergency_mode(double B_voltage, int counter)
 {
     // 根據不同電池電量，決定不同供電方案
-    if (B_voltage / counter >= 11.5)
+    if (B_voltage / counter >= 11.0)
     {
         Battery_100_Percent();
     }
-    else if (B_voltage / counter >= 9.0)
+    else if (B_voltage / counter >= 9. && B_voltage / counter <= 10.)
     {
         Battery_75_Percent();
     }
-    else if (B_voltage / counter >= 6.0)
+    else if (B_voltage / counter >= 7. && B_voltage / counter <= 8.)
     {
         Battery_50_Percent();
     }
-    else if (B_voltage / counter >= 3.0)
+    else if (B_voltage / counter >= 0.0 && B_voltage / counter <= 5.)
     {
         Battery_25_Percent();
     }
+    else if (lastmode_is_normal == true)
+    {
+        Battery_25_Percent();
+    }
+    lastmode_is_normal = false;
 }
 
 // 公共電力供電模式，綠能完全不供電
@@ -102,7 +118,7 @@ void public_elec_mode()
     digitalWrite(9, HIGH);
     digitalWrite(11, HIGH);
     digitalWrite(12, HIGH);
-    Serial.println("public_elec_mode is ON");
+    // Serial.println("public_elec_mode is ON");
 }
 
 // 檢查公共電力供電情形，並調整供電方針
@@ -110,7 +126,8 @@ void power_check(double B_voltage, int counter)
 {
     // 檢查公共電力是否在供電
     double voltage = analogRead(A0) * analogRead(A0) * (-0.000000585) + analogRead(A0) * 0.020823;
-
+    // Serial.println("pub voltage \t" + String(voltage));
+    Serial.println("solar voltage \t" + String(B_voltage / counter));
     // 若公共電力異常，啟動緊急供電模式
     if (voltage < 2)
     {
@@ -134,8 +151,8 @@ void Battery_25_Percent()
     digitalWrite(9, HIGH);
     digitalWrite(11, HIGH);
     digitalWrite(12, HIGH);
-    Serial.println("Battery is ON");
-    Serial.println("Battery power < 25%");
+    // Serial.println("Battery is ON");
+    // Serial.println("Battery power < 25%");
     digitalWrite(4, HIGH);
     digitalWrite(5, LOW);
     digitalWrite(10, LOW);
@@ -153,8 +170,8 @@ void Battery_50_Percent()
     digitalWrite(9, HIGH);
     digitalWrite(11, HIGH);
     digitalWrite(12, HIGH);
-    Serial.println("Battery is ON");
-    Serial.println("Battery power 25% ~ 50%");
+    // Serial.println("Battery is ON");
+    // Serial.println("Battery power 25% ~ 50%");
     digitalWrite(4, HIGH);
     digitalWrite(5, HIGH);
     digitalWrite(10, LOW);
@@ -172,8 +189,8 @@ void Battery_75_Percent()
     digitalWrite(9, LOW);
     digitalWrite(11, HIGH);
     digitalWrite(12, HIGH);
-    Serial.println("Battery is ON");
-    Serial.println("Battery power 50% ~ 75%");
+    // Serial.println("Battery is ON");
+    // Serial.println("Battery power 50% ~ 75%");
     digitalWrite(4, HIGH);
     digitalWrite(5, HIGH);
     digitalWrite(10, HIGH);
@@ -191,8 +208,8 @@ void Battery_100_Percent()
     digitalWrite(9, LOW);
     digitalWrite(11, LOW);
     digitalWrite(12, LOW);
-    Serial.println("Battery is ON");
-    Serial.println("Battery power 75% ~ 100%");
+    // Serial.println("Battery is ON");
+    // Serial.println("Battery power 75% ~ 100%");
     digitalWrite(4, HIGH);
     digitalWrite(5, HIGH);
     digitalWrite(10, HIGH);
