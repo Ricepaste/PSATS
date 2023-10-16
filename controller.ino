@@ -34,7 +34,7 @@ void loop()
         voltage = analogRead(A2) * analogRead(A2) * (-0.000000585) + analogRead(A2) * 0.020823;
         voltage_sum += voltage;
         counter++;
-    } while (now - last < 1000);
+    } while (now - last < 600);
 
     // 檢查目前的公共電力供電情形，並調整供電方針
     power_check(voltage_sum, counter);
@@ -57,7 +57,7 @@ void normal_mode(int B_voltage, int counter)
         Battery_50_Percent();
     }
     // 若電量不足25%，全部切換回到公共電力供電模式
-    else if (B_voltage / counter >= 0.0 && B_voltage / counter <= 5.)
+    else if (B_voltage / counter >= 0.0 && B_voltage / counter <= 4.)
     {
         public_elec_mode();
         // Serial.println("Battery power < 25%");
@@ -96,7 +96,7 @@ void emergency_mode(double B_voltage, int counter)
     {
         Battery_50_Percent();
     }
-    else if (B_voltage / counter >= 0.0 && B_voltage / counter <= 5.)
+    else if (B_voltage / counter >= 0.0 && B_voltage / counter <= 4.)
     {
         Battery_25_Percent();
     }
@@ -127,7 +127,7 @@ void power_check(double B_voltage, int counter)
     // 檢查公共電力是否在供電
     double voltage = analogRead(A0) * analogRead(A0) * (-0.000000585) + analogRead(A0) * 0.020823;
     // Serial.println("pub voltage \t" + String(voltage));
-    Serial.println("solar voltage \t" + String(B_voltage / counter));
+    // Serial.println("solar voltage \t" + String(B_voltage / counter));
     // 若公共電力異常，啟動緊急供電模式
     if (voltage < 2)
     {
